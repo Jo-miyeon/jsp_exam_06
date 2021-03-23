@@ -29,7 +29,7 @@ public class ArticleDetailServlet extends HttpServlet {
 			response.getWriter().append("DB 드라이버 클래스 로딩 실패");
 			return;
 		}
-		String url = "jdbc:mysql://localhost:3306/blog?serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true";
+		String url = "jdbc:mysql://localhost:3306/site40?serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true";
 		String user = "root";
 		String password = "";
 		
