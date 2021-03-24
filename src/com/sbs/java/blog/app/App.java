@@ -15,6 +15,7 @@ import com.sbs.java.blog.controller.HomeController;
 import com.sbs.java.blog.controller.MemberController;
 import com.sbs.java.blog.exception.SQLErrorException;
 import com.sbs.java.blog.util.Util;
+import com.sbs.java.blog.controller.TestController;
 
 public class App {
 	private HttpServletRequest req;
@@ -63,7 +64,7 @@ public class App {
 		} catch (SQLException e) {
 			Util.printEx("SQL 예외(커넥션 열기)", resp, e);
 		}catch(SQLErrorException e) {
-			Util.printEx(e.getMessage(), resp, e);
+			Util.printEx(e.getMessage(), resp, e.getOrigin());
 		}
 		catch (Exception e) {
 			Util.printEx("기타 예외", resp, e);
@@ -102,6 +103,9 @@ public class App {
 			break;
 		case "home":
 			controller = new HomeController(dbConn, actionMethodName, req, resp);
+			break;
+		case "test":
+			controller = new TestController(dbConn, actionMethodName, req, resp);
 			break;
 		}
 
