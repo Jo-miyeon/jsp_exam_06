@@ -4,14 +4,36 @@
 	pageEncoding="UTF-8"%>
 <%@ include file="/jsp/part/head.jspf"%>
 <%
-	List<Article> articles = (List<Article>) request.getAttribute("articles");
+List<Article> articles = (List<Article>) request.getAttribute("articles");
+int totalPage = (int) request.getAttribute("totalPage");
+int paramPage = (int) request.getAttribute("page");
+String cateItemName = (String)request.getAttribute("cateItemName");
 %>
 <!-- 하이라이트 라이브러리 추가, 토스트 UI 에디터에서 사용됨 -->
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<style>
+.page-box>ul>li>a {
+	padding: 0 10px;
+	text-decoration: underline;
+	color: #787878;
+}
 
+.page-box>ul>li:hover>a {
+	color: black;
+}
+
+.page-box>ul>li.current>a {
+	color: red;
+}
+</style>
+<h1 class="con">
+	<%=cateItemName%>
+</h1>
+
+<div class="con">총 게시물 수 : ${totalCount}</div>
 <!-- 하이라이트 라이브러리, 언어 -->
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/css.min.js"></script>
@@ -45,16 +67,37 @@
 <div class="con">
 	<ul>
 		<%
-			for (Article article : articles) {
+		for (Article article : articles) {
 		%>
 		<li><a href="./detail?id=<%=article.getId()%>"><%=article.getId()%>,
 				<%=article.getCateItemId()%>, <%=article.getTitle()%></a></li>
+		<%
+		}
+		%>
+	</ul>
+</div>
+<div class="con page-box">
+	<ul class="flex flex-jc-c">
+		<%
+			for (int i = 1; i <= totalPage; i++) {
+		%>
+		<li class="<%=i == paramPage ? "current" : ""%>"><a
+			href="?cateItemId=${param.cateItemId}&searchKeywordType=${param.searchKeywordType}&searchKeyword=${param.searchKeyword}&page=<%=i%>" class="block"><%=i%></a></li>
 		<%
 			}
 		%>
 	</ul>
 </div>
+<div class="con search-box flex flex-jc-c">
 
+	<form action="${pageContext.request.contextPath}/s/article/list">
+		<input type="hidden" name="page" value="1" /> <input type="hidden"
+			name="cateItemId" value="${param.cateItemId}" /> <input
+			type="hidden" name="searchKeywordType" value="title" /> <input
+			type="text" name="searchKeyword" value="${param.searchKeyword}" />
+		<button type="submit">검색</button>
+	</form>
 
+</div>
 
-<%@ include file="/jsp/part/foot.jspf"%> 
+<%@ include file="/jsp/part/foot.jspf"%>

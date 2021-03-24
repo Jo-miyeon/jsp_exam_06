@@ -10,10 +10,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import com.sbs.java.blog.exception.SQLErrorException;
 
 public class DBUtil {
-	public static Map<String, Object> selectRow(Connection connection, String sql) {
-		List<Map<String, Object>> rows = selectRows(connection, sql);
+	private HttpServletRequest req;
+	private HttpServletResponse resp;
+
+	public DBUtil(HttpServletRequest req, HttpServletResponse resp) {
+		this.req = req;
+		this.resp = resp;
+	}
+
+	public Map<String, Object> selectRow(Connection dbConn, String sql)throws SQLErrorException {
+		List<Map<String, Object>> rows = selectRows(dbConn, sql);
 
 		if (rows.size() == 0) {
 			return new HashMap<>();
@@ -22,14 +33,14 @@ public class DBUtil {
 		return rows.get(0);
 	}
 
-	public static List<Map<String, Object>> selectRows(Connection connection, String sql) {
+	public List<Map<String, Object>> selectRows(Connection dbConn, String sql) {
 		List<Map<String, Object>> rows = new ArrayList<>();
 
 		Statement stmt = null;
 		ResultSet rs = null;
 
 		try {
-			stmt = connection.createStatement();
+			stmt = dbConn.createStatement();
 			rs = stmt.executeQuery(sql);
 			ResultSetMetaData metaData = rs.getMetaData();
 			int columnSize = metaData.getColumnCount();
@@ -52,32 +63,60 @@ public class DBUtil {
 						row.put(columnName, value);
 					}
 				}
-
+				System.out.println(row);
 				rows.add(row);
 			}
 		} catch (SQLException e) {
-			System.err.println("[SQLException 예외]");
-			System.err.println("msg : " + e.getMessage());
+			throw new SQLErrorException("SQL 예외, SQL : " + sql);
 		} finally {
+			if (stmt != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					throw new SQLErrorException("SQL 예외, rs 닫기" + sql);
+				}
+			}
+
 			if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					System.err.println("[SQLException 예외]");
-					System.err.println("msg : " + e.getMessage());
-				}
-			}
-
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					System.err.println("[SQLException 예외]");
-					System.err.println("msg : " + e.getMessage());
+					throw new SQLErrorException("SQL 예외, stmt 닫기" + sql);
 				}
 			}
 		}
 
 		return rows;
 	}
+
+	public int selectRowIntValue(Connection dbConn, String sql) {
+		Map<String, Object> row = selectRow(dbConn, sql);
+
+		for (String key : row.keySet()) {
+			return (int) row.get(key);
+		}
+
+		return -1;
+	}
+
+	public String selectRowStringValue(Connection dbConn, String sql) {
+		Map<String, Object> row = selectRow(dbConn, sql);
+
+		for (String key : row.keySet()) {
+			return (String) row.get(key);
+		}
+
+		return "";
+	}
+
+	public boolean selectRowBooleanValue(Connection dbConn, String sql) {
+		Map<String, Object> row = selectRow(dbConn, sql);
+
+		for (String key : row.keySet()) {
+			return ((int) row.get(key)) == 1;
+		}
+
+		return false;
+	}
+
 }
