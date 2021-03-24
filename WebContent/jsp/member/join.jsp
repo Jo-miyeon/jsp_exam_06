@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ include file="/jsp/part/head.jspf"%>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
 
 <style>
 /* cus */
@@ -52,6 +53,10 @@
 			form.email.focus();
 			return;
 		}
+		form.loginPwReal.value = sha256(form.loginPw.value);
+		form.loginPw.value = '';
+		form.loginPwConfirm.value = '';
+		
 		form.submit();
 	}
 </script>
@@ -59,23 +64,24 @@
 <div class="join-form-box con">
 	<form action="doJoin" method="POST" class="join-form form1"
 		onsubmit="submitJoinForm(this); return false;">
+		<input type="hidden" name="loginPwReal" />
 		<div class="form-row">
-			<div class="label">로그인 아이디</div>
+			<div class="label">아이디</div>
 			<div class="input">
-				<input name="loginId" type="text" placeholder="로그인 아이디를 입력해주세요." />
+				<input name="loginId" type="text" placeholder="아이디를 입력해주세요." />
 			</div>
 		</div>
 		<div class="form-row">
-			<div class="label">로그인 비번</div>
+			<div class="label">비밀번호</div>
 			<div class="input">
-				<input name="loginPw" type="password" placeholder="로그인 비번을 입력해주세요." />
+				<input name="loginPw" type="password" placeholder="비밀번호를 입력해주세요." />
 			</div>
 		</div>
 		<div class="form-row">
-			<div class="label">로그인 비번확인</div>
+			<div class="label">비밀번호 확인</div>
 			<div class="input">
 				<input name="loginPwConfirm" type="password"
-					placeholder="로그인 비번확인을 입력해주세요." />
+					placeholder="비밀번호를 한번 더 입력해주세요" />
 			</div>
 		</div>
 		<div class="form-row">
@@ -97,7 +103,7 @@
 			</div>
 		</div>
 		<div class="form-row">
-			<div class="label">전송</div>
+			<div class="label"></div>
 			<div class="input">
 				<input type="submit" value="전송" /> <a href="../home/main">취소</a>
 			</div>
